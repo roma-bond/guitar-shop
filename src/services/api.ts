@@ -11,10 +11,7 @@ export const createAPI = (onServerStatusUpdate: (num: number) => void): AxiosIns
   });
 
   api.interceptors.response.use(
-    (response: AxiosResponse) => {
-      onServerStatusUpdate(response.status);
-      return response;
-    },
+    (response: AxiosResponse) => response,
 
     (error: AxiosError) => {
       const {response} = error;

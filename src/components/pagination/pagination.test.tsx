@@ -1,6 +1,6 @@
 import Pagination from './pagination';
 import { render, screen, waitFor } from '@testing-library/react';
-import { Router, createSearchParams } from 'react-router-dom';
+import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 
 describe('Component: Pagination', () => {
@@ -8,7 +8,7 @@ describe('Component: Pagination', () => {
     const history = createMemoryHistory();
     render(
       <Router location={history.location} navigator={history}>
-        <Pagination totalGuitars={150} activePage={3} searchParams={createSearchParams({})}/>
+        <Pagination totalGuitars={150} activePage={3} searchParamsString={''}/>
       </Router>,
     );
 
@@ -28,7 +28,7 @@ describe('Component: Pagination', () => {
     const history = createMemoryHistory();
     render(
       <Router location={history.location} navigator={history}>
-        <Pagination totalGuitars={15} activePage={1} searchParams={createSearchParams({})}/>
+        <Pagination totalGuitars={15} activePage={1} searchParamsString={''}/>
       </Router>,
     );
 
@@ -48,7 +48,7 @@ describe('Component: Pagination', () => {
     const history = createMemoryHistory();
     render(
       <Router location={history.location} navigator={history}>
-        <Pagination totalGuitars={15} activePage={2} searchParams={createSearchParams({})}/>
+        <Pagination totalGuitars={15} activePage={2} searchParamsString={''}/>
       </Router>,
     );
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, ChangeEvent } from 'react';
-import { useSearchParams, createSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Guitar } from '../../types/guitars';
 import ProductCard from '../product-card/product-card';
@@ -7,26 +7,25 @@ import Pagination from '../pagination/pagination';
 import ModalCartAdd from '../modal-cart-add/modal-cart-add';
 import ModalSuccessAdd from '../modal-success-add/modal-success-add';
 import { fetchGuitarsAndReviewsAction } from '../../store/api-actions';
-import { GUITARS_PER_PAGE } from '../../const';
 import {
-  isStringCheckboxDisabled,
-  convertSearchParamsToObject
+  convertSearchParamsToObject,
+  refineSearchParams,
+  clearSearchRange
 } from '../../utils/utils';
 import { RootState } from '../../store/store';
 import { Backdrop, CircularProgress } from '@mui/material';
 import './catalog-page.styled.css';
 
-const getActivePage = (start: string | string[]) =>
-  start && typeof start === 'string' && Number(start) > 0
-    ? (Number(start) / GUITARS_PER_PAGE) + 1
-    : 1;
-
-const clearSearchRange = (paramsObj: { [k: string]: string | string[] }) => {
-  delete paramsObj._start;
-  delete paramsObj._limit;
-};
-
 function CatalogPage(): JSX.Element {
+  const minPriceInputRef = useRef<HTMLInputElement>(null);
+  const maxPriceInputRef = useRef<HTMLInputElement>(null);
+  const typeAcousticRef = useRef<HTMLInputElement>(null);
+  const typeElectricRef = useRef<HTMLInputElement>(null);
+  const typeUkuleleRef = useRef<HTMLInputElement>(null);
+  const filterBy4StringsInputRef = useRef<HTMLInputElement>(null);
+  const filterBy6StringsInputRef = useRef<HTMLInputElement>(null);
+  const filterBy7StringsInputRef = useRef<HTMLInputElement>(null);
+  const filterBy12StringsInputRef = useRef<HTMLInputElement>(null);
   const sortByPriceInputRef = useRef<HTMLButtonElement>(null);
   const sortByRatingInputRef = useRef<HTMLButtonElement>(null);
   const sortByAscOrderInputRef = useRef<HTMLButtonElement>(null);
@@ -43,35 +42,123 @@ function CatalogPage(): JSX.Element {
   );
   const [guitarToBuy, setGuitarToBuy] = useState<Guitar | null>(null);
   const [guitarConfirm, setGuitarConfirm] = useState<boolean>(false);
-  const [nameFilter, setNameFilter] = useState<string>('');
   const [displayedGuitars, setDisplayedGuitars] = useState(guitars);
-  const [activePage, setActivePage] = useState(1);
+  const [activePage, setActivePage] = useState(0);
+  const [totalGuitars, setTotalGuitars] = useState(0);
 
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    const currentParams = convertSearchParamsToObject(searchParams);
-    if (currentParams.name && typeof currentParams.name === 'string' ) {
-      setNameFilter(currentParams.name);
-      delete currentParams.name;
+    // REFINE search params on start if any
+    const refinedSearchParams = refineSearchParams(searchParams);
+    if (refinedSearchParams.toString() !== searchParams.toString()) {
+      setSearchParams(refinedSearchParams);
     }
-    Object.entries(currentParams).length === 0
-      ? dispatch(fetchGuitarsAndReviewsAction(''))
-      : dispatch(fetchGuitarsAndReviewsAction(`?${createSearchParams(currentParams).toString()}`));
-    const currentActivePage = getActivePage(currentParams._start);
-    if (currentActivePage !== activePage) {
-      setActivePage(currentActivePage);
+    // SETUP initial filters if any
+    for(const key of searchParams.keys()) {
+      switch (key) {
+        case 'price_gte':
+          if (minPriceInputRef.current) {
+            minPriceInputRef.current.value = searchParams.get(key) || '';
+          }
+          break;
+        case 'price_lte':
+          if (maxPriceInputRef.current) {
+            maxPriceInputRef.current.value = searchParams.get(key) || '';
+          }
+          break;
+        case 'type':
+          searchParams.getAll(key).forEach((guitarType) => {
+            switch (guitarType) {
+              case 'acoustic':
+                if (typeAcousticRef.current) {
+                  typeAcousticRef.current.checked = true;
+                }
+                break;
+              case 'electric':
+                if (typeElectricRef.current) {
+                  typeElectricRef.current.checked = true;
+                }
+                break;
+              case 'ukulele':
+                if (typeUkuleleRef.current) {
+                  typeUkuleleRef.current.checked = true;
+                }
+                break;
+              default:
+                break;
+            }
+          });
+          break;
+        case 'stringCount':
+          searchParams.getAll(key).forEach((stringAmount) => {
+            switch (stringAmount) {
+              case '4':
+                if (filterBy4StringsInputRef.current) {
+                  filterBy4StringsInputRef.current.checked = true;
+                }
+                break;
+              case '6':
+                if (filterBy6StringsInputRef.current) {
+                  filterBy6StringsInputRef.current.checked = true;
+                }
+                break;
+              case '7':
+                if (filterBy7StringsInputRef.current) {
+                  filterBy7StringsInputRef.current.checked = true;
+                }
+                break;
+              case '12':
+                if (filterBy12StringsInputRef.current) {
+                  filterBy12StringsInputRef.current.checked = true;
+                }
+                break;
+              default:
+                break;
+            }
+          });
+          break;
+        case '_sort':
+          if (searchParams.get(key) === 'price' && sortByPriceInputRef.current) {
+            sortByPriceInputRef.current.classList.add('catalog-sort__type-button--active');
+          } else if (searchParams.get(key) === 'rating' && sortByRatingInputRef.current) {
+            sortByRatingInputRef.current.classList.add('catalog-sort__type-button--active');
+          }
+          break;
+        case '_order':
+          if (searchParams.get(key) === 'asc' && sortByAscOrderInputRef.current) {
+            sortByAscOrderInputRef.current.classList.add('catalog-sort__order-button--active');
+          } else if (searchParams.get(key) === 'desc' && sortByDescOrderInputRef.current) {
+            sortByDescOrderInputRef.current.classList.add('catalog-sort__order-button--active');
+          }
+          break;
+        default:
+          break;
+      }
+    }
+
+    setActivePage(1);
+  }, []);
+
+  useEffect(() => {
+    if (activePage > 0) {
+      searchParams.toString() === ''
+        ? dispatch(fetchGuitarsAndReviewsAction(''))
+        : dispatch(fetchGuitarsAndReviewsAction(`?${searchParams.toString()}`));
+      const currentActivePage = (Number(searchParams.get('_start')) / 9) + 1 || 1;
+      if (currentActivePage !== activePage) {
+        setActivePage(currentActivePage);
+      }
     }
   }, [dispatch, searchParams, activePage]);
 
   useEffect(() => {
     if (!searchParams.get('_start')) {
-      nameFilter === ''
-        ? setDisplayedGuitars(guitars)
-        : setDisplayedGuitars(guitars.filter((guitar) => guitar.name.toLowerCase().includes(nameFilter.toLowerCase())));
+      setTotalGuitars(guitars.length);
     }
-  }, [guitars, nameFilter]);
+    setDisplayedGuitars(guitars);
+  }, [guitars]);
 
   useEffect(() => {
     const min = Math.min(...displayedGuitars.map((guitar) => guitar.price));
@@ -132,6 +219,8 @@ function CatalogPage(): JSX.Element {
   };
 
   const handleMinPriceChange = (e: ChangeEvent<HTMLInputElement>) => {
+    searchParams.delete('_start');
+    searchParams.delete('_limit');
     const searchParamsObj = convertSearchParamsToObject(searchParams);
     if (e.target.value) {
       e.preventDefault();
@@ -156,6 +245,8 @@ function CatalogPage(): JSX.Element {
   };
 
   const handleMaxPriceChange = (e: ChangeEvent<HTMLInputElement>) => {
+    searchParams.delete('_start');
+    searchParams.delete('_limit');
     const searchParamsObj = convertSearchParamsToObject(searchParams);
     if (e.target.value) {
       e.preventDefault();
@@ -180,22 +271,68 @@ function CatalogPage(): JSX.Element {
   };
 
   const handleTypeCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const searchParamsObj = convertSearchParamsToObject(searchParams);
-    clearSearchRange(searchParamsObj);
-    e.target.checked
-      ? setSearchParams({
-        ...searchParamsObj,
-        type: searchParams.getAll('type').concat(e.target.name),
-      })
-      : setSearchParams({
-        ...searchParamsObj,
-        type: searchParams
-          .getAll('type')
-          .filter((type) => type !== e.target.name),
+    searchParams.delete('_start');
+    searchParams.delete('_limit');
+    const params = new URLSearchParams(searchParams.toString());
+    const name = e.target.name;
+    if (e.target.checked) {
+      params.append('type', name);
+    } else {
+      const chosenTypes = params.getAll('type');
+      params.delete('type');
+      chosenTypes.filter((type) => type !== name).forEach((type) => {
+        params.append('type', type);
       });
+    }
+
+    const selectedTypes = params.getAll('type');
+    if (filterBy4StringsInputRef.current &&
+      filterBy6StringsInputRef.current &&
+      filterBy7StringsInputRef.current &&
+      filterBy12StringsInputRef.current) {
+      filterBy4StringsInputRef.current.disabled = false;
+      filterBy6StringsInputRef.current.disabled = false;
+      filterBy7StringsInputRef.current.disabled = false;
+      filterBy12StringsInputRef.current.disabled = false;
+      if (!selectedTypes.includes('electric') && !selectedTypes.includes('ukulele')) {
+        filterBy4StringsInputRef.current.disabled = true;
+        filterBy4StringsInputRef.current.checked = false;
+        const stringArr = params.getAll('stringCount');
+        const filteredArr = stringArr.filter((stringAmount) => stringAmount !== '4');
+        params.delete('stringCount');
+        filteredArr.forEach((stringAmount) => {
+          params.append('stringCount', stringAmount.toString());
+        });
+      }
+      if (!selectedTypes.includes('electric') && !selectedTypes.includes('acoustic')) {
+        filterBy6StringsInputRef.current.disabled = true;
+        filterBy6StringsInputRef.current.checked = false;
+        filterBy7StringsInputRef.current.disabled = true;
+        filterBy7StringsInputRef.current.checked = false;
+        const stringArr = params.getAll('stringCount');
+        const filteredArr = stringArr.filter((stringAmount) => stringAmount !== '6' && stringAmount !== '7');
+        params.delete('stringCount');
+        filteredArr.forEach((stringAmount) => {
+          params.append('stringCount', stringAmount.toString());
+        });
+      }
+      if (!selectedTypes.includes('acoustic')) {
+        filterBy12StringsInputRef.current.disabled = true;
+        const stringArr = params.getAll('stringCount');
+        const filteredArr = stringArr.filter((stringAmount) => stringAmount !== '12');
+        params.delete('stringCount');
+        filteredArr.forEach((stringAmount) => {
+          params.append('stringCount', stringAmount.toString());
+        });
+      }
+    }
+
+    setSearchParams(params.toString());
   };
 
   const handleStringsCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
+    searchParams.delete('_start');
+    searchParams.delete('_limit');
     const searchParamsObj = convertSearchParamsToObject(searchParams);
     clearSearchRange(searchParamsObj);
     const name = e.target.name.split('-')[0];
@@ -214,7 +351,6 @@ function CatalogPage(): JSX.Element {
 
   const handleResetFilterClick = () => {
     setSearchParams({});
-    setNameFilter('');
   };
 
   const renderGuitarCards = () => {
@@ -239,9 +375,7 @@ function CatalogPage(): JSX.Element {
       },
     );
 
-    const min = (activePage - 1) * GUITARS_PER_PAGE;
-    const max = activePage * GUITARS_PER_PAGE;
-    return guitarsJSX.filter((_, index) => index >= min && index < max);
+    return guitarsJSX.filter((_, index) => index < 9);
   };
 
   return (
@@ -272,6 +406,7 @@ function CatalogPage(): JSX.Element {
                   <div className="form-input">
                     <label className="visually-hidden" htmlFor="priceMin">Минимальная цена</label>
                     <input
+                      ref={minPriceInputRef}
                       type="number"
                       placeholder={minProductPrice?.toString()}
                       id="priceMin"
@@ -283,6 +418,7 @@ function CatalogPage(): JSX.Element {
                   <div className="form-input">
                     <label className="visually-hidden" htmlFor="priceMax">Максимальная цена</label>
                     <input
+                      ref={maxPriceInputRef}
                       type="number"
                       placeholder={maxProductPrice?.toString()}
                       id="priceMax"
@@ -299,6 +435,7 @@ function CatalogPage(): JSX.Element {
                 </legend>
                 <div className="form-checkbox catalog-filter__block-item">
                   <input
+                    ref={typeAcousticRef}
                     className="visually-hidden"
                     type="checkbox"
                     id="acoustic"
@@ -309,6 +446,7 @@ function CatalogPage(): JSX.Element {
                 </div>
                 <div className="form-checkbox catalog-filter__block-item">
                   <input
+                    ref={typeElectricRef}
                     className="visually-hidden"
                     type="checkbox"
                     id="electric"
@@ -319,6 +457,7 @@ function CatalogPage(): JSX.Element {
                 </div>
                 <div className="form-checkbox catalog-filter__block-item">
                   <input
+                    ref={typeUkuleleRef}
                     className="visually-hidden"
                     type="checkbox"
                     id="ukulele"
@@ -334,59 +473,44 @@ function CatalogPage(): JSX.Element {
                 </legend>
                 <div className="form-checkbox catalog-filter__block-item">
                   <input
+                    ref={filterBy4StringsInputRef}
                     className="visually-hidden"
                     type="checkbox"
                     id="4-strings"
                     name="4-strings"
-                    disabled={isStringCheckboxDisabled(
-                      searchParams.getAll('type'),
-                      'electric',
-                      'ukulele',
-                    )}
                     onChange={handleStringsCheckboxChange}
                   />
                   <label htmlFor="4-strings">4</label>
                 </div>
                 <div className="form-checkbox catalog-filter__block-item">
                   <input
+                    ref={filterBy6StringsInputRef}
                     className="visually-hidden"
                     type="checkbox"
                     id="6-strings"
                     name="6-strings"
-                    disabled={isStringCheckboxDisabled(
-                      searchParams.getAll('type'),
-                      'acoustic',
-                      'electric',
-                    )}
                     onChange={handleStringsCheckboxChange}
                   />
                   <label htmlFor="6-strings">6</label>
                 </div>
                 <div className="form-checkbox catalog-filter__block-item">
                   <input
+                    ref={filterBy7StringsInputRef}
                     className="visually-hidden"
                     type="checkbox"
                     id="7-strings"
                     name="7-strings"
-                    disabled={isStringCheckboxDisabled(
-                      searchParams.getAll('type'),
-                      'acoustic',
-                      'electric',
-                    )}
                     onChange={handleStringsCheckboxChange}
                   />
                   <label htmlFor="7-strings">7</label>
                 </div>
                 <div className="form-checkbox catalog-filter__block-item">
                   <input
+                    ref={filterBy12StringsInputRef}
                     className="visually-hidden"
                     type="checkbox"
                     id="12-strings"
                     name="12-strings"
-                    disabled={isStringCheckboxDisabled(
-                      searchParams.getAll('type'),
-                      'acoustic',
-                    )}
                     onChange={handleStringsCheckboxChange}
                   />
                   <label htmlFor="12-strings">12</label>
@@ -451,11 +575,11 @@ function CatalogPage(): JSX.Element {
                 <CircularProgress color="inherit" />
               </Backdrop>
             )}
-            {displayedGuitars.length > 9 && (
+            {(totalGuitars > 9) && (
               <Pagination
-                totalGuitars={displayedGuitars.length}
+                totalGuitars={totalGuitars}
                 activePage={activePage}
-                searchParams={searchParams}
+                searchParamsString={searchParams.toString()}
               />
             )}
           </div>

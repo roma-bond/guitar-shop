@@ -1,5 +1,5 @@
 import { useState, useRef, ChangeEvent, FocusEvent, FormEvent } from 'react';
-import { Link, NavLink, useNavigate, createSearchParams } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import SearchFormList from '../search-form-list/search-form-list';
 import { RootState } from '../../store/store';
@@ -12,6 +12,7 @@ function Header(): JSX.Element {
   const { guitars } = useSelector((state: RootState) => state.data);
   const [ searchResultGuitars, setSearchResultGuitars ] = useState<GuitarWithReviews[]>([]);
   const [ filterPhrase, setFilterPhrase ] = useState<string>('');
+  const [searchParams] = useSearchParams();
 
   const activeClassName = 'link main-nav__link link--current';
   const notActiveClassName = 'link main-nav__link';
@@ -48,10 +49,13 @@ function Header(): JSX.Element {
 
   const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const params = { name: filterPhrase };
+    // const params = { name: filterPhrase };
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('name_like');
+    params.set('name_like', filterPhrase);
     navigate({
       pathname: '/catalog',
-      search: `?${createSearchParams(params)}`,
+      search: `?${params.toString()}`,
     });
     handleInputReset();
   };

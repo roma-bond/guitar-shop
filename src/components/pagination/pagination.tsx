@@ -5,15 +5,15 @@ import './pagination.styled.css';
 type PaginationProps = {
   totalGuitars: number;
   activePage: number;
-  searchParams: URLSearchParams;
+  searchParamsString: string;
 };
 
 function Pagination(props: PaginationProps): JSX.Element {
-  const { totalGuitars, activePage, searchParams } = props;
+  const { totalGuitars, activePage, searchParamsString } = props;
   const pagesAmount = Math.ceil(totalGuitars / GUITARS_PER_PAGE);
 
   const renderPreviousButton = () => {
-    const localParams = new URLSearchParams(searchParams);
+    const localParams = new URLSearchParams(searchParamsString);
     const start = Number(localParams.get('_start'));
     localParams.set('_start', (start - GUITARS_PER_PAGE).toString());
     localParams.set('_limit', GUITARS_PER_PAGE.toString());
@@ -40,7 +40,7 @@ function Pagination(props: PaginationProps): JSX.Element {
           ? 'pagination__page pagination__page--active'
           : 'pagination__page';
 
-      const localParams = new URLSearchParams(searchParams);
+      const localParams = new URLSearchParams(searchParamsString);
       localParams.set('_start', (index * GUITARS_PER_PAGE).toString());
       localParams.set('_limit', GUITARS_PER_PAGE.toString());
 
@@ -61,7 +61,7 @@ function Pagination(props: PaginationProps): JSX.Element {
 
   const renderNextButton = () => {
     if (activePage !== pagesAmount) {
-      const localParams = new URLSearchParams(searchParams);
+      const localParams = new URLSearchParams(searchParamsString);
       const start = Number(localParams.get('_start'));
       localParams.set('_start', (start + GUITARS_PER_PAGE).toString());
       localParams.set('_limit', GUITARS_PER_PAGE.toString());

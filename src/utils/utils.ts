@@ -49,3 +49,46 @@ export const convertSearchParamsToObject = (
   }
   return searchParamsObj;
 };
+
+export const refineSearchParams = (searchParams: URLSearchParams) => {
+  const validNames = ['_start', '_limit', '_sort', '_order', 'name_like', 'price_gte', 'price_lte', 'type', 'stringCount'];
+  const refinedParamsObj: { [key: string]: string | string[] } = {};
+  for(const entry of searchParams.entries()) {
+    const key = entry[0];
+    const value = entry[1];
+    if (validNames.includes(key)) {
+      if (key === 'type' || key === 'stringCount') {
+        if (!refinedParamsObj.key) {
+          refinedParamsObj[key] = new Array(value);
+        } else {
+          if (!refinedParamsObj[key].includes(value)) {
+            const arr = [...refinedParamsObj[key]];
+            arr.push(value);
+            refinedParamsObj[key] = arr;
+          }
+        }
+      } else {
+        if (!refinedParamsObj.key) {
+          refinedParamsObj[key] = value;
+        }
+      }
+    }
+  }
+  const refinedSearchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(refinedParamsObj)) {
+    if (Array.isArray(value)) {
+      value.forEach((element) => {
+        refinedSearchParams.append(key, element);
+      });
+    } else {
+      refinedSearchParams.append(key, value);
+    }
+  }
+
+  return refinedSearchParams;
+};
+
+export const clearSearchRange = (paramsObj: { [k: string]: string | string[] }) => {
+  delete paramsObj._start;
+  delete paramsObj._limit;
+};

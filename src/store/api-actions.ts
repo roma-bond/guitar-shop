@@ -89,6 +89,7 @@ export const fetchGuitarsAndReviewsAction = createAsyncThunk<
           }),
         );
         dispatch(loadGuitars(guitarsWithReviews));
+        dispatch(updateServerStatus(200));
         dispatch(loadGuitar(null));
       } else {
         dispatch(loadGuitars([]));
