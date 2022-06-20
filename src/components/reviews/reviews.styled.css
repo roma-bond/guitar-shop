@@ -1,0 +1,35 @@
+.reviews {
+  position: relative;
+
+  padding-top: 48px;
+}
+
+.reviews__title {
+  margin-top: 0;
+  margin-bottom: 34px;
+
+  font-weight: bold;
+
+  color: #010101;
+}
+
+.reviews__sumbit-button {
+  top: 46px;
+  right: 0;
+  position: absolute;
+}
+
+.reviews__more-button {
+  bottom: 0;
+  position: relative;
+
+  min-width: 300px;
+  margin: 0 auto;
+}
+
+.reviews__up-button {
+  right: 0;
+  bottom: -51px;
+  position: absolute;
+  z-index: 10;
+}

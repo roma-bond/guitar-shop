@@ -1,0 +1,135 @@
+.form-review {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-review__wrapper {
+  display: flex;
+
+  margin-bottom: 5px;
+  padding-top: 23px;
+}
+
+.form-review__name-wrapper {
+  width: 175px;
+  margin-right: 30px;
+}
+
+.form-review__label {
+  display: inline-block;
+  align-self: flex-start;
+
+  margin-bottom: 5px;
+
+  font-size: 12px;
+  line-height: 15px;
+
+  color: #585757;
+
+  letter-spacing: 0.02em;
+}
+
+.form-review__label--required {
+  position: relative;
+}
+
+.form-review__label--required::before {
+  top: -5px;
+  right: -10px;
+  position: absolute;
+
+  width: 5px;
+  height: 5px;
+
+  font-size: 12px;
+  line-height: 16px;
+
+  color: #c90606;
+
+  content: '*';
+}
+
+.form-review__input {
+  width: 100%;
+  padding: 5px 8px;
+
+  font-size: 14px;
+
+  border: 1px solid #585757;
+  border-radius: 2px;
+  background-color: inherit;
+}
+
+.form-review__input--name {
+  margin-bottom: 0;
+}
+
+.form-review__input--textarea {
+  height: 70px;
+}
+
+.form-review__input::-webkit-input-placeholder {
+  font-size: 14px;
+  line-height: 15px;
+
+  color: #000000;
+
+  letter-spacing: 0.02em;
+}
+
+.form-review__input::-moz-placeholder {
+  font-size: 14px;
+  line-height: 15px;
+
+  color: #000000;
+
+  letter-spacing: 0.02em;
+}
+
+.form-review__input:-ms-input-placeholder {
+  font-size: 14px;
+  line-height: 15px;
+
+  color: #000000;
+
+  letter-spacing: 0.02em;
+}
+
+.form-review__input::-ms-input-placeholder {
+  font-size: 14px;
+  line-height: 15px;
+
+  color: #000000;
+
+  letter-spacing: 0.02em;
+}
+
+.form-review__input::placeholder {
+  font-size: 14px;
+  line-height: 15px;
+
+  color: #000000;
+
+  letter-spacing: 0.02em;
+}
+
+.form-review__warning {
+  display: block;
+
+  margin: 0;
+  padding-right: 5px;
+
+  font-size: 10px;
+  line-height: 15px;
+
+  color: #eb5555;
+
+  text-align: end;
+  letter-spacing: 0.02em;
+}
+
+.form-review__button {
+  margin-top: 7px;
+  margin-right: 70px;
+  margin-left: 70px;
+}

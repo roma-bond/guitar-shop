@@ -1,0 +1,73 @@
+.cart {
+  padding-top: 2px;
+  padding-bottom: 3px;
+}
+
+.cart__footer {
+  display: flex;
+  align-content: stretch;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+
+  margin-top: 26px;
+}
+
+.cart__coupon {
+  flex: 0 0 50%;
+}
+
+.cart__total-info {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  justify-content: space-between;
+
+  min-width: 220px;
+}
+
+.cart__total-item {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  justify-content: space-between;
+
+  width: 100%;
+  margin: 0 0 11px 0;
+  padding: 0;
+}
+
+.cart__total-value-name {
+  margin: 0;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  letter-spacing: 0.05em;
+}
+
+.cart__total-value {
+  margin: 0 0 0 20px;
+
+  font-size: 20px;
+  font-weight: 400;
+
+  letter-spacing: 0.05em;
+}
+
+.cart__total-value--bonus {
+  color: #c90606;
+}
+
+.cart__total-value--payment {
+  font-weight: 700;
+}
+
+.cart__order-button {
+  align-self: flex-end;
+
+  width: 100%;
+  margin-top: 15px;
+
+  letter-spacing: 0.05em;
+}
