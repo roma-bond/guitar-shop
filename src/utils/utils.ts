@@ -51,14 +51,14 @@ export const convertSearchParamsToObject = (
 };
 
 export const refineSearchParams = (searchParams: URLSearchParams) => {
-  const validNames = ['_start', '_limit', '_sort', '_order', 'name_like', 'price_gte', 'price_lte', 'type', 'stringCount'];
+  const validNames = ['totalGuitars', '_start', '_limit', '_sort', '_order', 'name_like', 'price_gte', 'price_lte', 'type', 'stringCount'];
   const refinedParamsObj: { [key: string]: string | string[] } = {};
   for(const entry of searchParams.entries()) {
     const key = entry[0];
     const value = entry[1];
     if (validNames.includes(key)) {
       if (key === 'type' || key === 'stringCount') {
-        if (!refinedParamsObj.key) {
+        if (!refinedParamsObj[key]) {
           refinedParamsObj[key] = new Array(value);
         } else {
           if (!refinedParamsObj[key].includes(value)) {

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, ChangeEvent } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Guitar } from '../../types/guitars';
 import ProductCard from '../product-card/product-card';
@@ -31,6 +31,11 @@ function CatalogPage(): JSX.Element {
   const sortByAscOrderInputRef = useRef<HTMLButtonElement>(null);
   const sortByDescOrderInputRef = useRef<HTMLButtonElement>(null);
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { pageid } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const { guitars } = useSelector((state: RootState) => state.data);
   const { status } = useSelector((state: RootState) => state.server);
 
@@ -44,10 +49,7 @@ function CatalogPage(): JSX.Element {
   const [guitarConfirm, setGuitarConfirm] = useState<boolean>(false);
   const [displayedGuitars, setDisplayedGuitars] = useState(guitars);
   const [activePage, setActivePage] = useState(0);
-  const [totalGuitars, setTotalGuitars] = useState(0);
-
-  const dispatch = useDispatch();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [totalGuitars, setTotalGuitars] = useState(Number(searchParams.get('totalGuitars')) || 0);
 
   useEffect(() => {
     // REFINE search params on start if any
@@ -156,8 +158,15 @@ function CatalogPage(): JSX.Element {
   useEffect(() => {
     if (!searchParams.get('_start')) {
       setTotalGuitars(guitars.length);
+      searchParams.set('totalGuitars', guitars.length.toString());
     }
     setDisplayedGuitars(guitars);
+    if (guitars.length > 9 && !pageid) {
+      navigate({
+        pathname: '/catalog/page1',
+        search: `?${searchParams.toString()}`,
+      });
+    }
   }, [guitars]);
 
   useEffect(() => {
@@ -356,7 +365,7 @@ function CatalogPage(): JSX.Element {
   const renderGuitarCards = () => {
     const guitarsJSX = displayedGuitars.map(
       ({ id, name, previewImg, price, rating, reviews }) => {
-        const localImg = `./img/content/catalog-product-${
+        const localImg = `../img/content/catalog-product-${
           previewImg.split('-')[1]
         }`;
 

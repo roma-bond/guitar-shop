@@ -22,7 +22,7 @@ function Pagination(props: PaginationProps): JSX.Element {
         <li className="pagination__page pagination__page--prev" id="prev">
           <Link
             className="link pagination__page-link"
-            to={`${AppRoute.Catalog}?${localParams.toString()}`}
+            to={`${AppRoute.Catalog}/page${activePage - 1}?${localParams.toString()}`}
           >
             Назад
           </Link>
@@ -48,7 +48,7 @@ function Pagination(props: PaginationProps): JSX.Element {
         <li key={`pagination-page-${index}`} className={classes}>
           <Link
             className="link pagination__page-link"
-            to={`${AppRoute.Catalog}?${localParams.toString()}`}
+            to={`${AppRoute.Catalog}/page${index + 1}?${localParams.toString()}`}
           >
             {index + 1}
           </Link>
@@ -69,7 +69,7 @@ function Pagination(props: PaginationProps): JSX.Element {
         <li className="pagination__page pagination__page--next" id="next">
           <Link
             className="link pagination__page-link"
-            to={`${AppRoute.Catalog}?${localParams.toString()}`}
+            to={`${AppRoute.Catalog}/page${activePage + 1}?${localParams.toString()}`}
           >
             Далее
           </Link>
