@@ -1,6 +1,56 @@
-import './cart-page.styled.css';
+import { useRef, FormEvent, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import CartItem from '../cart-item/cart-item';
+import ModalCartDelete from '../modal-cart-delete/modal-cart-delete';
+import { removeGuitarFromCart, cancelGuitarRemoveFromCart, setCartDiscount } from '../../store/cart-reducer';
+import { postPromocode } from '../../store/api-actions';
+import { RootState } from '../../store/store';
+import { formatPrice } from '../../utils/utils';
+import './cart-page.css';
 
 function CartPage(): JSX.Element {
+  const promocodeInputRef = useRef<HTMLInputElement>(null);
+  const { cartGuitars, cartGuitarBeforeRemove, discount } = useSelector((state: RootState) => state.cart);
+  const totalPriceWithoutDiscount = cartGuitars
+    .map((guitar) => guitar.price * guitar.guitarCount)
+    .reduce((a, b) => a + b, 0);
+  const purchaseDiscount = discount > 0
+    ? (discount / 100) * totalPriceWithoutDiscount
+    : 0;
+
+  const dispatch = useDispatch();
+
+  useEffect(() => () => {
+    dispatch(setCartDiscount(0));
+  }, []);
+
+  const handleModalClose = () => {
+    if (cartGuitarBeforeRemove) {
+      dispatch(cancelGuitarRemoveFromCart());
+    }
+  };
+
+  const handleGuitarDelete = () => {
+    if (cartGuitarBeforeRemove) {
+      dispatch(removeGuitarFromCart(cartGuitarBeforeRemove.id));
+    }
+  };
+
+  const handlePromocodeSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (promocodeInputRef.current) {
+      const promocode = promocodeInputRef.current.value.toLowerCase();
+
+      if (promocode.includes(' ')) {
+        dispatch(setCartDiscount(-1000));
+      } else {
+        promocode
+          ? dispatch(postPromocode(promocode))
+          : dispatch(setCartDiscount(0));
+      }
+    }
+  };
+
   return (
     <main className="page-content">
       <div className="container">
@@ -21,110 +71,14 @@ function CartPage(): JSX.Element {
           </li>
         </ul>
         <div className="cart">
-          <div className="cart-item">
-            <button
-              className="cart-item__close-button button-cross"
-              type="button"
-              aria-label="Удалить"
-            >
-              <span className="button-cross__icon"></span>
-              <span className="cart-item__close-button-interactive-area"></span>
-            </button>
-            <div className="cart-item__image">
-              <img
-                src="img/content/catalog-product-2.jpg"
-                srcSet="img/content/catalog-product-2@2x.jpg 2x"
-                width="55"
-                height="130"
-                alt="ЭлектроГитара Честер bass"
+          {
+            cartGuitars.map((guitar) => (
+              <CartItem
+                key={`cartGuitar-${guitar.id}`}
+                guitar={guitar}
               />
-            </div>
-            <div className="product-info cart-item__info">
-              <p className="product-info__title">ЭлектроГитара Честер bass</p>
-              <p className="product-info__info">Артикул: SO757575</p>
-              <p className="product-info__info">Электрогитара, 6 струнная</p>
-            </div>
-            <div className="cart-item__price">17 500 ₽</div>
-            <div className="quantity cart-item__quantity">
-              <button
-                className="quantity__button"
-                aria-label="Уменьшить количество"
-              >
-                <svg width="8" height="8" aria-hidden="true">
-                  <use xlinkHref="#icon-minus"></use>
-                </svg>
-              </button>
-              <input
-                className="quantity__input"
-                type="number"
-                placeholder="1"
-                id="2-count"
-                name="2-count"
-                max="99"
-              />
-              <button
-                className="quantity__button"
-                aria-label="Увеличить количество"
-              >
-                <svg width="8" height="8" aria-hidden="true">
-                  <use xlinkHref="#icon-plus"></use>
-                </svg>
-              </button>
-            </div>
-            <div className="cart-item__price-total">17 500 ₽</div>
-          </div>
-          <div className="cart-item">
-            <button
-              className="cart-item__close-button button-cross"
-              type="button"
-              aria-label="Удалить"
-            >
-              <span className="button-cross__icon"></span>
-              <span className="cart-item__close-button-interactive-area"></span>
-            </button>
-            <div className="cart-item__image">
-              <img
-                src="img/content/catalog-product-4.jpg"
-                srcSet="img/content/catalog-product-4@2x.jpg 2x"
-                width="55"
-                height="130"
-                alt="СURT Z30 Plus"
-              />
-            </div>
-            <div className="product-info cart-item__info">
-              <p className="product-info__title">СURT Z30 Plus</p>
-              <p className="product-info__info">Артикул: SO754565</p>
-              <p className="product-info__info">Электрогитара, 6 струнная</p>
-            </div>
-            <div className="cart-item__price">34 500 ₽</div>
-            <div className="quantity cart-item__quantity">
-              <button
-                className="quantity__button"
-                aria-label="Уменьшить количество"
-              >
-                <svg width="8" height="8" aria-hidden="true">
-                  <use xlinkHref="#icon-minus"></use>
-                </svg>
-              </button>
-              <input
-                className="quantity__input"
-                type="number"
-                placeholder="1"
-                id="4-count"
-                name="4-count"
-                max="99"
-              />
-              <button
-                className="quantity__button"
-                aria-label="Увеличить количество"
-              >
-                <svg width="8" height="8" aria-hidden="true">
-                  <use xlinkHref="#icon-plus"></use>
-                </svg>
-              </button>
-            </div>
-            <div className="cart-item__price-total">34 500 ₽</div>
-          </div>
+            ))
+          }
           <div className="cart__footer">
             <div className="cart__coupon coupon">
               <h2 className="title title--little coupon__title">
@@ -138,18 +92,25 @@ function CartPage(): JSX.Element {
                 id="coupon-form"
                 method="post"
                 action="/"
+                onSubmit={handlePromocodeSubmit}
               >
                 <div className="form-input coupon__input">
                   <label className="visually-hidden">Промокод</label>
                   <input
+                    ref={promocodeInputRef}
                     type="text"
                     placeholder="Введите промокод"
                     id="coupon"
                     name="coupon"
                   />
-                  <p className="form-input__message form-input__message--success">
-                    Промокод принят
-                  </p>
+                  {discount > 0 &&
+                    <p className="form-input__message form-input__message--success">
+                      Промокод принят
+                    </p>}
+                  {discount < 0 &&
+                    <p className="form-input__message form-input__message--error">
+                      Неверный промокод
+                    </p>}
                 </div>
                 <button className="button button--big coupon__button">
                   Применить
@@ -159,18 +120,18 @@ function CartPage(): JSX.Element {
             <div className="cart__total-info">
               <p className="cart__total-item">
                 <span className="cart__total-value-name">Всего:</span>
-                <span className="cart__total-value">52 000 ₽</span>
+                <span className="cart__total-value">{formatPrice(totalPriceWithoutDiscount)} ₽</span>
               </p>
               <p className="cart__total-item">
                 <span className="cart__total-value-name">Скидка:</span>
                 <span className="cart__total-value cart__total-value--bonus">
-                  - 3000 ₽
+                  - {purchaseDiscount} ₽
                 </span>
               </p>
               <p className="cart__total-item">
                 <span className="cart__total-value-name">К оплате:</span>
                 <span className="cart__total-value cart__total-value--payment">
-                  49 000 ₽
+                  {formatPrice(totalPriceWithoutDiscount - purchaseDiscount)} ₽
                 </span>
               </p>
               <button className="button button--red button--big cart__order-button">
@@ -180,6 +141,19 @@ function CartPage(): JSX.Element {
           </div>
         </div>
       </div>
+      {
+        cartGuitarBeforeRemove &&
+        <ModalCartDelete
+          name={cartGuitarBeforeRemove.name}
+          vendorCode={cartGuitarBeforeRemove.vendorCode}
+          previewImg={cartGuitarBeforeRemove.previewImg}
+          stringCount={cartGuitarBeforeRemove.stringCount}
+          price={cartGuitarBeforeRemove.price}
+          type={cartGuitarBeforeRemove.type}
+          onClose={handleModalClose}
+          onDeleteFromCart={handleGuitarDelete}
+        />
+      }
     </main>
   );
 }

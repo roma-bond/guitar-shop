@@ -1,7 +1,7 @@
 import ProductCardRating from '../product-card-rating/product-card-rating';
 import { Review } from '../../types/guitars';
 import { formatDate } from '../../utils/utils';
-import './review-item.styled.css';
+import './review-item.css';
 
 type ReviewItemProps = {
   review: Review;

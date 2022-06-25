@@ -7,7 +7,7 @@ import { postNewReviewAction } from '../../store/api-actions';
 import useEventListener from '../../hooks/use-event-listener';
 import { validNoticeStyle } from '../../const';
 import { GuitarWithReviews } from '../../types/guitars';
-import './modal-review.styled.css';
+import './modal-review.css';
 
 type ModalReviewProps = {
   onModalClose: () => void;

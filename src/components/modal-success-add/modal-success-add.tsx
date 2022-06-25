@@ -1,17 +1,26 @@
+import { useNavigate } from 'react-router-dom';
 import Modal from '../modal/modal';
+import { AppRoute } from '../../const';
 
 type ModalSuccessAddProps = {
   onContinueShopping: () => void;
+  onClose: () => void;
 };
 
 function ModalSuccessAdd(props: ModalSuccessAddProps): JSX.Element {
-  const { onContinueShopping } = props;
+  const { onContinueShopping, onClose } = props;
+
+  const navigate = useNavigate();
+
+  const handleRedirectButtonClick = () => {
+    navigate(AppRoute.Cart);
+  };
 
   return (
     <Modal
       modalClass="modal--success"
       windowHeight={410}
-      onModalClose={onContinueShopping}
+      onModalClose={onClose}
       testId='close'
     >
       <svg
@@ -24,7 +33,10 @@ function ModalSuccessAdd(props: ModalSuccessAddProps): JSX.Element {
       </svg>
       <p className="modal__message">Товар успешно добавлен в корзину</p>
       <div className="modal__button-container modal__button-container--add">
-        <button className="button button--small modal__button">
+        <button
+          className="button button--small modal__button"
+          onClick={handleRedirectButtonClick}
+        >
           Перейти в корзину
         </button>
         <button

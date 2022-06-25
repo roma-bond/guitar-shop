@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import FocusTrap from 'focus-trap-react';
-import './modal.styled.css';
+import './modal.css';
 
 type ModalProps = {
   windowHeight: number;

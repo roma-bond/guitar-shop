@@ -1,6 +1,7 @@
 import { createAsyncThunk, Dispatch } from '@reduxjs/toolkit';
 import { loadGuitars, loadGuitar, updateGuitarReviews } from './guitar-reducer';
 import { updateServerStatus } from './server-reducer';
+import { setCartDiscount } from './cart-reducer';
 import { APIRoute } from '../const';
 import { Guitar, Review, NewUserReview } from '../types/guitars';
 import { State } from '../types/store';
@@ -69,6 +70,9 @@ export const fetchGuitarsAndReviewsAction = createAsyncThunk<
     try {
       const { data: guitars } = await api.get<Guitar[]>(`${APIRoute.Guitars}${params}`);
       if (guitars) {
+        guitars.forEach((guitar) => {
+          guitar.previewImg = `/img/content/catalog-product-${guitar.previewImg.split('-')[1]}`;
+        });
         const guitarsWithReviews = await Promise.all(
           guitars.filter((guitar) => guitar.previewImg && true).map(async (guitar) => {
             try {
@@ -136,6 +140,34 @@ export const postNewReviewAction = createAsyncThunk<
       }
     } catch (e) {
       throw new Error('No Reviews loaded from server!');
+    }
+  },
+);
+
+export const postPromocode = createAsyncThunk<
+  void,
+  string,
+  {
+    dispatch: Dispatch;
+    state: State;
+    extra: AxiosInstance;
+  }
+>(
+  'data/postPromocode',
+  async (promocode, { dispatch, getState, extra: api }) => {
+    try {
+      const promocodeObj = {
+        coupon: promocode,
+      };
+
+      const { data: discount } = await api.post<number>(APIRoute.Coupons, promocodeObj);
+
+      if (discount) {
+        dispatch(setCartDiscount(discount));
+      }
+    } catch (e) {
+      dispatch(setCartDiscount(-1000));
+      throw new Error('Invalid value!');
     }
   },
 );

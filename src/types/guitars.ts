@@ -1,4 +1,4 @@
-type GuitarType = 'acoustic' | 'electric' | 'ukulele';
+export type GuitarType = 'acoustic' | 'electric' | 'ukulele';
 
 export type Guitar = {
   id: number;
@@ -36,4 +36,9 @@ type WithReviews = {
   reviews: Review[];
 };
 
+type WithCount = {
+  guitarCount: number;
+};
+
 export type GuitarWithReviews = Guitar & WithReviews;
+export type GuitarWithCount = Guitar & WithCount;

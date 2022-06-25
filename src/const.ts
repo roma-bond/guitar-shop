@@ -11,6 +11,7 @@ export enum AppRoute {
 export enum APIRoute {
   Guitars = '/guitars',
   Comments = '/comments',
+  Coupons = '/coupons',
 }
 
 export const estimate = new Map([

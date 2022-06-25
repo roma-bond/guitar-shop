@@ -2,7 +2,7 @@ import { KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GuitarWithReviews } from '../../types/guitars';
 import { AppRoute } from '../../const';
-import './search-form-list.styled.css';
+import './search-form-list.css';
 
 type SearchFormListProps = {
   guitars: GuitarWithReviews[];

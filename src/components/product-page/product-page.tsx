@@ -1,25 +1,31 @@
-import { useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { HashLink } from 'react-router-hash-link';
 import { useDispatch, useSelector } from 'react-redux';
+import ModalCartAdd from '../modal-cart-add/modal-cart-add';
+import ModalSuccessAdd from '../modal-success-add/modal-success-add';
 import ProductCardRating from '../product-card-rating/product-card-rating';
+import Reviews from '../reviews/reviews';
 import { fetchGuitarAndReviewsAction } from '../../store/api-actions';
+import { addGuitarToCart } from '../../store/cart-reducer';
 import { RootState } from '../../store/store';
 import { AppRoute, guitarMap } from '../../const';
 import { formatPrice } from '../../utils/utils';
-import Reviews from '../reviews/reviews';
 import { Backdrop, CircularProgress } from '@mui/material';
-import './product-page.styled.css';
+import './product-page.css';
 
 function ProductPage(): JSX.Element {
   const { guitarId } = useParams();
   const { guitar } = useSelector((state: RootState) => state.data);
+  const [ isModalOpen, setIsModalOpen ] = useState(false);
+  const [ isConfirmModalOpen, setIsConfirmModalOpen ] = useState(false);
   const characteristicsButtonRef = useRef<HTMLAnchorElement>(null);
   const descriptionButtonRef = useRef<HTMLAnchorElement>(null);
   const characteristicsRef = useRef<HTMLTableElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (guitarId) {
@@ -51,6 +57,34 @@ function ProductPage(): JSX.Element {
     if (descriptionRef.current) {
       descriptionRef.current.classList.remove('hidden');
     }
+  };
+
+  const handleAddLinkClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleConfirmModalClose = () => {
+    setIsConfirmModalOpen(false);
+  };
+
+  const handleGuitarAddToCart = () => {
+    if (guitar) {
+      dispatch(addGuitarToCart({
+        ...guitar,
+        guitarCount: 1,
+      }));
+    }
+    setIsModalOpen(false);
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleGuitarConfirmModalClose = () => {
+    setIsConfirmModalOpen(false);
+    navigate(AppRoute.Catalog);
   };
 
   return (
@@ -160,12 +194,13 @@ function ProductPage(): JSX.Element {
                 <p className="product-container__price-info product-container__price-info--value">
                   {formatPrice(guitar.price)} ₽
                 </p>
-                <a
+                <Link
                   className="button button--red button--big product-container__button"
-                  href="#"
+                  to={'#'}
+                  onClick={handleAddLinkClick}
                 >
                   Добавить&nbsp;в&nbsp;корзину
-                </a>
+                </Link>
               </div>
             </div>
             <Reviews reviews={guitar.reviews} data-testid="guitar-reviews" />
@@ -175,6 +210,23 @@ function ProductPage(): JSX.Element {
           <Backdrop open>
             <CircularProgress color="inherit" />
           </Backdrop>
+        )}
+        {isModalOpen && guitar && (
+          <ModalCartAdd
+            name={guitar.name}
+            vendorCode={guitar.vendorCode}
+            previewImg={`/img/content/catalog-product-${guitar.previewImg.split('product-')[1]}`}
+            stringCount={guitar.stringCount}
+            price={guitar.price}
+            onClose={handleModalClose}
+            onAddToCart={handleGuitarAddToCart}
+          />
+        )}
+        {isConfirmModalOpen && (
+          <ModalSuccessAdd
+            onContinueShopping={handleGuitarConfirmModalClose}
+            onClose={handleConfirmModalClose}
+          />
         )}
       </div>
     </main>

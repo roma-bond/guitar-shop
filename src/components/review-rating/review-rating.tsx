@@ -1,6 +1,6 @@
 import { useRef, MouseEvent, KeyboardEvent, Fragment, RefObject } from 'react';
 import { estimate, validNoticeStyle } from '../../const';
-import './review-rating.styled.css';
+import './review-rating.css';
 
 type ReviewRatingProps = {
   onLabelClick: (e: MouseEvent<HTMLLabelElement>) => void;

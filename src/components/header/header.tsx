@@ -5,13 +5,19 @@ import SearchFormList from '../search-form-list/search-form-list';
 import { RootState } from '../../store/store';
 import { GuitarWithReviews } from '../../types/guitars';
 import { AppRoute } from '../../const';
-import './header.styled.css';
+import './header.css';
 
 function Header(): JSX.Element {
   const navigate = useNavigate();
+
   const { guitars } = useSelector((state: RootState) => state.data);
+  const { cartGuitars } = useSelector((state: RootState) => state.cart);
+
+  const guitarIndex = cartGuitars.reduce((prev, cartGuitar) => prev + cartGuitar.guitarCount, 0);
+
   const [ searchResultGuitars, setSearchResultGuitars ] = useState<GuitarWithReviews[]>([]);
   const [ filterPhrase, setFilterPhrase ] = useState<string>('');
+
   const [searchParams] = useSearchParams();
 
   const activeClassName = 'link main-nav__link link--current';
@@ -157,7 +163,9 @@ function Header(): JSX.Element {
             <use xlinkHref="#icon-basket"></use>
           </svg>
           <span className="visually-hidden">Перейти в корзину</span>
-          <span className="header__cart-count">2</span>
+          {
+            guitarIndex > 0 && <span className="header__cart-count">{guitarIndex}</span>
+          }
         </Link>
       </div>
     </header>

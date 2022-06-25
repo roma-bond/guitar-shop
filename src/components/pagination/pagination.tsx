@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { GUITARS_PER_PAGE, AppRoute } from '../../const';
-import './pagination.styled.css';
+import './pagination.css';
 
 type PaginationProps = {
   totalGuitars: number;

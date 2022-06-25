@@ -10,7 +10,7 @@ import ModalNetworkError from '../modal-network-error/modal-network-error';
 import { AppRoute } from '../../const';
 import { RootState } from '../../store/store';
 import { updateServerStatus } from '../../store/server-reducer';
-import './app.styled.css';
+import './app.css';
 
 function App(): JSX.Element {
   const { status } = useSelector((state: RootState) => state.server);

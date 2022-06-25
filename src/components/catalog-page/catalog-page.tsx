@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef, ChangeEvent } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Guitar } from '../../types/guitars';
-import ProductCard from '../product-card/product-card';
-import Pagination from '../pagination/pagination';
 import ModalCartAdd from '../modal-cart-add/modal-cart-add';
 import ModalSuccessAdd from '../modal-success-add/modal-success-add';
+import Pagination from '../pagination/pagination';
+import ProductCard from '../product-card/product-card';
 import { fetchGuitarsAndReviewsAction } from '../../store/api-actions';
+import { addGuitarToCart } from '../../store/cart-reducer';
+import { Guitar } from '../../types/guitars';
 import {
   convertSearchParamsToObject,
   refineSearchParams,
@@ -14,7 +15,8 @@ import {
 } from '../../utils/utils';
 import { RootState } from '../../store/store';
 import { Backdrop, CircularProgress } from '@mui/material';
-import './catalog-page.styled.css';
+import './catalog-page.css';
+import { AppRoute } from '../../const';
 
 function CatalogPage(): JSX.Element {
   const minPriceInputRef = useRef<HTMLInputElement>(null);
@@ -37,6 +39,7 @@ function CatalogPage(): JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { guitars } = useSelector((state: RootState) => state.data);
+  const { cartGuitars } = useSelector((state: RootState) => state.cart);
   const { status } = useSelector((state: RootState) => state.server);
 
   const [minProductPrice, setMinProductPrice] = useState<number | undefined>(
@@ -161,6 +164,7 @@ function CatalogPage(): JSX.Element {
       searchParams.set('totalGuitars', guitars.length.toString());
     }
     setDisplayedGuitars(guitars);
+
     if (guitars.length > 9 && !pageid) {
       navigate({
         pathname: '/catalog/page1',
@@ -184,6 +188,9 @@ function CatalogPage(): JSX.Element {
   };
 
   const handleGuitarAddToCart = () => {
+    if (guitarToBuy) {
+      dispatch(addGuitarToCart({...guitarToBuy, guitarCount: 1}));
+    }
     setGuitarToBuy(null);
     setGuitarConfirm(true);
   };
@@ -303,36 +310,38 @@ function CatalogPage(): JSX.Element {
       filterBy6StringsInputRef.current.disabled = false;
       filterBy7StringsInputRef.current.disabled = false;
       filterBy12StringsInputRef.current.disabled = false;
-      if (!selectedTypes.includes('electric') && !selectedTypes.includes('ukulele')) {
-        filterBy4StringsInputRef.current.disabled = true;
-        filterBy4StringsInputRef.current.checked = false;
-        const stringArr = params.getAll('stringCount');
-        const filteredArr = stringArr.filter((stringAmount) => stringAmount !== '4');
-        params.delete('stringCount');
-        filteredArr.forEach((stringAmount) => {
-          params.append('stringCount', stringAmount.toString());
-        });
-      }
-      if (!selectedTypes.includes('electric') && !selectedTypes.includes('acoustic')) {
-        filterBy6StringsInputRef.current.disabled = true;
-        filterBy6StringsInputRef.current.checked = false;
-        filterBy7StringsInputRef.current.disabled = true;
-        filterBy7StringsInputRef.current.checked = false;
-        const stringArr = params.getAll('stringCount');
-        const filteredArr = stringArr.filter((stringAmount) => stringAmount !== '6' && stringAmount !== '7');
-        params.delete('stringCount');
-        filteredArr.forEach((stringAmount) => {
-          params.append('stringCount', stringAmount.toString());
-        });
-      }
-      if (!selectedTypes.includes('acoustic')) {
-        filterBy12StringsInputRef.current.disabled = true;
-        const stringArr = params.getAll('stringCount');
-        const filteredArr = stringArr.filter((stringAmount) => stringAmount !== '12');
-        params.delete('stringCount');
-        filteredArr.forEach((stringAmount) => {
-          params.append('stringCount', stringAmount.toString());
-        });
+      if (selectedTypes.length > 0) {
+        if (!selectedTypes.includes('electric') && !selectedTypes.includes('ukulele')) {
+          filterBy4StringsInputRef.current.disabled = true;
+          filterBy4StringsInputRef.current.checked = false;
+          const stringArr = params.getAll('stringCount');
+          const filteredArr = stringArr.filter((stringAmount) => stringAmount !== '4');
+          params.delete('stringCount');
+          filteredArr.forEach((stringAmount) => {
+            params.append('stringCount', stringAmount.toString());
+          });
+        }
+        if (!selectedTypes.includes('electric') && !selectedTypes.includes('acoustic')) {
+          filterBy6StringsInputRef.current.disabled = true;
+          filterBy6StringsInputRef.current.checked = false;
+          filterBy7StringsInputRef.current.disabled = true;
+          filterBy7StringsInputRef.current.checked = false;
+          const stringArr = params.getAll('stringCount');
+          const filteredArr = stringArr.filter((stringAmount) => stringAmount !== '6' && stringAmount !== '7');
+          params.delete('stringCount');
+          filteredArr.forEach((stringAmount) => {
+            params.append('stringCount', stringAmount.toString());
+          });
+        }
+        if (!selectedTypes.includes('acoustic')) {
+          filterBy12StringsInputRef.current.disabled = true;
+          const stringArr = params.getAll('stringCount');
+          const filteredArr = stringArr.filter((stringAmount) => stringAmount !== '12');
+          params.delete('stringCount');
+          filteredArr.forEach((stringAmount) => {
+            params.append('stringCount', stringAmount.toString());
+          });
+        }
       }
     }
 
@@ -364,24 +373,20 @@ function CatalogPage(): JSX.Element {
 
   const renderGuitarCards = () => {
     const guitarsJSX = displayedGuitars.map(
-      ({ id, name, previewImg, price, rating, reviews }) => {
-        const localImg = `../img/content/catalog-product-${
-          previewImg.split('-')[1]
-        }`;
-
-        return (
-          <ProductCard
-            key={`guitar-${id}`}
-            id={id}
-            name={name}
-            previewImg={localImg}
-            price={price}
-            rating={rating}
-            reviewsCount={reviews.length}
-            onBuy={handleGuitarBuy}
-          />
-        );
-      },
+      ({ id, name, previewImg, price, rating, reviews }) => (
+        <ProductCard
+          key={`guitar-${id}`}
+          id={id}
+          name={name}
+          previewImg={previewImg}
+          price={price}
+          rating={rating}
+          reviewsCount={reviews.length}
+          isInCart={cartGuitars.findIndex((guitar) => guitar.id === id) >= 0}
+          linkTo={`${AppRoute.Catalog}/${pageid ? pageid : 'page1'}?${searchParams.toString()}`}
+          onBuy={handleGuitarBuy}
+        />
+      ),
     );
 
     return guitarsJSX.filter((_, index) => index < 9);
@@ -606,7 +611,10 @@ function CatalogPage(): JSX.Element {
         />
       )}
       {guitarConfirm && (
-        <ModalSuccessAdd onContinueShopping={handleGuitarConfirmModalClose} />
+        <ModalSuccessAdd
+          onContinueShopping={handleGuitarConfirmModalClose}
+          onClose={handleGuitarConfirmModalClose}
+        />
       )}
     </>
   );

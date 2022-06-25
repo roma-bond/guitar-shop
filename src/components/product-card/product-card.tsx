@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import ProductCardRating from '../product-card-rating/product-card-rating';
 import { AppRoute } from '../../const';
 import { formatPrice } from '../../utils/utils';
-import './product-card.styled.css';
+import './product-card.css';
 
 type ProductCardProps = {
   id: number;
@@ -11,13 +11,18 @@ type ProductCardProps = {
   rating: number;
   price: number;
   reviewsCount: number;
+  isInCart: boolean;
+  linkTo: string;
   onBuy: (id: number) => void;
 };
 
 function ProductCard(props: ProductCardProps): JSX.Element {
-  const { id, name, previewImg, rating, price, reviewsCount, onBuy } = props;
+  const { id, name, previewImg, rating, price, reviewsCount, isInCart, linkTo, onBuy } = props;
 
   const formattedPrice = formatPrice(price);
+  const linkClass = isInCart
+    ? 'button--red-border button--in-cart'
+    : 'button--red button--add-to-cart';
 
   return (
     <div className="product-card" data-testid="product">
@@ -48,13 +53,13 @@ function ProductCard(props: ProductCardProps): JSX.Element {
         <Link className="button button--mini" to={`${AppRoute.Product}/${id}`}>
           Подробнее
         </Link>
-        <a
-          className="button button--red button--mini button--add-to-cart"
-          href="#"
+        <Link
+          className={`button button--mini ${linkClass}`}
+          to={linkTo}
           onClick={onBuy.bind(null, id)}
         >
-          Купить
-        </a>
+          {isInCart ? 'В Корзине' : 'Купить'}
+        </Link>
       </div>
     </div>
   );

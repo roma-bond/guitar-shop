@@ -1,5 +1,6 @@
 import Modal from '../modal/modal';
 import useEventListener from '../../hooks/use-event-listener';
+import { formatPrice } from '../../utils/utils';
 
 type ModalCartAddProps = {
   name: string;
@@ -24,8 +25,6 @@ function ModalCartAdd(props: ModalCartAddProps): JSX.Element {
 
   useEventListener(onClose);
 
-  const localImg = `./img/content/catalog-product-${previewImg.split('-')[1]}`;
-
   return (
     <Modal
       windowHeight={440}
@@ -37,8 +36,8 @@ function ModalCartAdd(props: ModalCartAddProps): JSX.Element {
       <div className="modal__info">
         <img
           className="modal__img"
-          src={localImg}
-          srcSet={`${localImg}@2x.png 2x`}
+          src={previewImg}
+          srcSet={`${previewImg.split('.jpg')[0]}@2x.jpg 2x`}
           width="67"
           height="137"
           alt={name}
@@ -62,7 +61,7 @@ function ModalCartAdd(props: ModalCartAddProps): JSX.Element {
           <p className="modal__price-wrapper">
             <span className="modal__price">Цена:</span>
             <span className="modal__price" data-testid="price">
-              {price} ₽
+              {formatPrice(price)} ₽
             </span>
           </p>
         </div>

@@ -5,7 +5,7 @@ import ReviewItem from '../review-item/review-item';
 import ModalReview from '../modal-review/modal-review';
 import ModalSuccessReview from '../modal-success-review/modal-success-review';
 import { Review } from '../../types/guitars';
-import './reviews.styled.css';
+import './reviews.css';
 
 type ReviewsProps = {
   reviews: Review[];

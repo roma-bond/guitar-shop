@@ -18,7 +18,7 @@ describe('Component: ProductCard', () => {
     const history = createMemoryHistory();
     render(
       <Router location={history.location} navigator={history}>
-        <ProductCard {...guitar} />
+        <ProductCard {...guitar} isInCart={false} linkTo={'/catalog'} />
       </Router>,
     );
 

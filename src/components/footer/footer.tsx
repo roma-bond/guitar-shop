@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../const';
-import './footer.styled.css';
+import './footer.css';
 
 function Footer(): JSX.Element {
   return (
