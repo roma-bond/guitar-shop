@@ -31,6 +31,9 @@ const renderApp = (route = '/') => {
     server: {
       status: 200,
     },
+    cart: {
+      cartGuitars: [],
+    },
   });
 
   const history = createMemoryHistory({ initialEntries: [route] });

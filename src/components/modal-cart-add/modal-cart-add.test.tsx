@@ -1,5 +1,6 @@
-import ModalCartAdd from './modal-cart-add';
+import { formatPrice } from '../../utils/utils';
 import { render, screen, waitFor } from '@testing-library/react';
+import ModalCartAdd from './modal-cart-add';
 
 describe('Component: ModalCartAdd', () => {
   const modalProps = {
@@ -31,6 +32,6 @@ describe('Component: ModalCartAdd', () => {
     );
 
     const price = await waitFor(async () => await screen.findByTestId('price'));
-    expect(price.innerHTML).toBe(`${modalProps.price} ₽`);
+    expect(price.innerHTML).toBe(`${formatPrice(modalProps.price)} ₽`);
   });
 });

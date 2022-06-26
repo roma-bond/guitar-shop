@@ -1,9 +1,20 @@
-import ModalSuccessAdd from './modal-success-add';
+import { Router } from 'react-router-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { createMemoryHistory } from 'history';
+import ModalSuccessAdd from './modal-success-add';
+
+const history = createMemoryHistory();
 
 describe('Component: ModalSuccessAdd', () => {
   it('should render ModalSuccessAdd correctly', async () => {
-    render(<ModalSuccessAdd onContinueShopping={jest.fn()} onClose={jest.fn()} />);
+    render(
+      <Router location={history.location} navigator={history}>
+        <ModalSuccessAdd
+          onContinueShopping={jest.fn()}
+          onClose={jest.fn()}
+        />
+      </Router>,
+    );
 
     expect(
       screen.getByText('Товар успешно добавлен в корзину'),
@@ -11,8 +22,15 @@ describe('Component: ModalSuccessAdd', () => {
   });
 
   it('should enable close handler on clicking the Close button', () => {
-    const mockSubmitFn = jest.fn();
-    render(<ModalSuccessAdd onContinueShopping={mockSubmitFn} onClose={jest.fn()} />);
+    const mockCloseFn = jest.fn();
+    render(
+      <Router location={history.location} navigator={history}>
+        <ModalSuccessAdd
+          onContinueShopping={jest.fn()}
+          onClose={mockCloseFn}
+        />
+      </Router>,
+    );
 
     const button = screen.getByTestId('close');
     fireEvent(
@@ -23,6 +41,6 @@ describe('Component: ModalSuccessAdd', () => {
       }),
     );
 
-    expect(mockSubmitFn).toBeCalledTimes(1);
+    expect(mockCloseFn).toBeCalledTimes(1);
   });
 });

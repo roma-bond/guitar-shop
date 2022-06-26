@@ -164,7 +164,7 @@ function Header(): JSX.Element {
           </svg>
           <span className="visually-hidden">Перейти в корзину</span>
           {
-            guitarIndex > 0 && <span className="header__cart-count">{guitarIndex}</span>
+            guitarIndex > 0 && <span className="header__cart-count" data-testid="cartIndex">{guitarIndex}</span>
           }
         </Link>
       </div>

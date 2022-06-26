@@ -1,4 +1,10 @@
-import { formatPrice, formatDate, isStringCheckboxDisabled, convertSearchParamsToObject } from './utils';
+import {
+  formatPrice,
+  formatDate,
+  isStringCheckboxDisabled,
+  convertSearchParamsToObject,
+  clearSearchRange
+} from './utils';
 
 describe('Utils: helper functions', () => {
   it('formatPrice should properly format input prices', () => {
@@ -63,5 +69,15 @@ describe('Utils: helper functions', () => {
       sort: 'price',
       order: 'desc',
     });
+  });
+
+  it('clearSearchRange should delete properties _start and _limit', () => {
+    const testParamsObj = {
+      totalGuitars: '20',
+      _start: '9',
+      _limit: '9',
+    };
+    clearSearchRange(testParamsObj);
+    expect(testParamsObj).toEqual({ totalGuitars: '20' });
   });
 });

@@ -50,6 +50,9 @@ const setupComponent = () => {
     server: {
       status: 200,
     },
+    cart: {
+      cartGuitars: [],
+    },
   });
 
   const history = createMemoryHistory();
@@ -112,7 +115,7 @@ describe('Component: CatalogPage', () => {
         cancelable: true,
       }),
     );
-    expect(history.location.search).toBe('?_sort=price');
+    expect(history.location.search).toBe('?totalGuitars=2&_sort=price');
   });
 
   it('should update search params properly on "sort by rating" click', () => {
@@ -143,7 +146,7 @@ describe('Component: CatalogPage', () => {
         cancelable: true,
       }),
     );
-    expect(history.location.search).toBe('?_sort=rating');
+    expect(history.location.search).toBe('?totalGuitars=2&_sort=rating');
   });
 
   it('should update search params properly on "sort by order" click', () => {
@@ -174,7 +177,7 @@ describe('Component: CatalogPage', () => {
         cancelable: true,
       }),
     );
-    expect(history.location.search).toBe('?_order=asc&_sort=price');
+    expect(history.location.search).toBe('?totalGuitars=2&_order=asc&_sort=price');
 
     const buttonOrderDownEl = screen.getByLabelText('По убыванию');
     expect(buttonOrderDownEl).toBeInTheDocument();
@@ -186,7 +189,7 @@ describe('Component: CatalogPage', () => {
         cancelable: true,
       }),
     );
-    expect(history.location.search).toBe('?_order=desc&_sort=price');
+    expect(history.location.search).toBe('?totalGuitars=2&_order=desc&_sort=price');
   });
 
   it('should update search params properly on "filter by min price" input', () => {
@@ -211,7 +214,7 @@ describe('Component: CatalogPage', () => {
     expect(minPriceInputEl).toBeInTheDocument();
 
     fireEvent.blur(minPriceInputEl, {target: {value: '5000'}});
-    expect(history.location.search).toBe('?price_gte=5000');
+    expect(history.location.search).toBe('?totalGuitars=2&price_gte=5000');
   });
 
   it('should update search params properly on "filter by max price" input', () => {
@@ -236,7 +239,7 @@ describe('Component: CatalogPage', () => {
     expect(maxPriceInputEl).toBeInTheDocument();
 
     fireEvent.blur(maxPriceInputEl, {target: {value: '14000'}});
-    expect(history.location.search).toBe('?price_lte=14000');
+    expect(history.location.search).toBe('?totalGuitars=2&price_lte=14000');
   });
 
   it('should update search params properly on "filter by type" input', () => {
@@ -267,7 +270,7 @@ describe('Component: CatalogPage', () => {
         cancelable: true,
       }),
     );
-    expect(history.location.search).toBe('?type=acoustic');
+    expect(history.location.search).toBe('?totalGuitars=2&type=acoustic');
   });
 
   it('should update search params properly on "filter by string count" input', () => {
@@ -298,6 +301,6 @@ describe('Component: CatalogPage', () => {
         cancelable: true,
       }),
     );
-    expect(history.location.search).toBe('?stringCount=4');
+    expect(history.location.search).toBe('?totalGuitars=2&stringCount=4');
   });
 });
