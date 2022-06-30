@@ -30,7 +30,10 @@ describe('Reducer: cartReducer', () => {
     expect(cartReducer(void 0, { type: 'UNKNOWN_ACTION' })).toEqual({
       cartGuitars: [],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     });
   });
 
@@ -39,7 +42,10 @@ describe('Reducer: cartReducer', () => {
     expect(cartReducer(state, addGuitarToCart(mockGuitar))).toEqual({
       cartGuitars: [mockGuitar],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     });
   });
 
@@ -47,13 +53,19 @@ describe('Reducer: cartReducer', () => {
     const state = {
       cartGuitars: [mockGuitar],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     };
 
     expect(cartReducer(state, addGuitarToCart(mockGuitar))).toEqual({
       cartGuitars: [{ ...mockGuitar, guitarCount: 3 }],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     });
   });
 
@@ -61,13 +73,19 @@ describe('Reducer: cartReducer', () => {
     const state = {
       cartGuitars: [mockGuitar],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     };
 
     expect(cartReducer(state, removeGuitarFromCart(11))).toEqual({
       cartGuitars: [mockGuitar],
       cartGuitarBeforeRemove: mockGuitar,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     });
   });
 
@@ -75,7 +93,10 @@ describe('Reducer: cartReducer', () => {
     const state = {
       cartGuitars: [mockGuitar],
       cartGuitarBeforeRemove: mockGuitar,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     };
 
     expect(cartReducer(state, removeGuitarFromCart(11))).toEqual(cartReducerInitialState);
@@ -85,13 +106,19 @@ describe('Reducer: cartReducer', () => {
     const state = {
       cartGuitars: [mockGuitar],
       cartGuitarBeforeRemove: mockGuitar,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     };
 
     expect(cartReducer(state, cancelGuitarRemoveFromCart())).toEqual({
       cartGuitars: [mockGuitar],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     });
   });
 
@@ -99,13 +126,19 @@ describe('Reducer: cartReducer', () => {
     const state = {
       cartGuitars: [mockGuitar],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     };
 
     expect(cartReducer(state, decreaseCartGuitarCount(11))).toEqual({
       cartGuitars: [{ ...mockGuitar, guitarCount: 1 }],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     });
   });
 
@@ -113,13 +146,19 @@ describe('Reducer: cartReducer', () => {
     const state = {
       cartGuitars: [{ ...mockGuitar, guitarCount: 1 }],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     };
 
     expect(cartReducer(state, decreaseCartGuitarCount(11))).toEqual({
       cartGuitars: [{ ...mockGuitar, guitarCount: 1 }],
       cartGuitarBeforeRemove: { ...mockGuitar, guitarCount: 1 },
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     });
   });
 
@@ -127,13 +166,19 @@ describe('Reducer: cartReducer', () => {
     const state = {
       cartGuitars: [mockGuitar],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     };
 
     expect(cartReducer(state, increaseCartGuitarCount(11))).toEqual({
       cartGuitars: [{ ...mockGuitar, guitarCount: 3 }],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     });
   });
 
@@ -141,22 +186,31 @@ describe('Reducer: cartReducer', () => {
     const state = {
       cartGuitars: [mockGuitar],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     };
 
     expect(cartReducer(state, updateCartGuitarCount({ id: 11, updateBy: 10 }))).toEqual({
       cartGuitars: [{ ...mockGuitar, guitarCount: 10 }],
       cartGuitarBeforeRemove: null,
-      discount: 0,
+      discount: {
+        amount: 0,
+        value: '',
+      },
     });
   });
 
   it('should set discount by setCartDiscount', () => {
     const state = cartReducerInitialState;
 
-    expect(cartReducer(state, setCartDiscount(25))).toEqual({
+    expect(cartReducer(state, setCartDiscount({ amount: 25, value: 'ggg'}))).toEqual({
       ...cartReducerInitialState,
-      discount: 25,
+      discount: {
+        amount: 25,
+        value: 'ggg',
+      },
     });
   });
 });

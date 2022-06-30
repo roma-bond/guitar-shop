@@ -4,13 +4,19 @@ import { GuitarWithCount } from '../types/guitars';
 export interface CartState {
   cartGuitars: GuitarWithCount[],
   cartGuitarBeforeRemove: GuitarWithCount | null,
-  discount: number,
+  discount: {
+    amount: number,
+    value: string,
+  },
 }
 
 export const cartReducerInitialState: CartState = {
   cartGuitars: [],
   cartGuitarBeforeRemove: null,
-  discount: 0,
+  discount: {
+    amount: 0,
+    value: '',
+  },
 };
 
 export const cartSlice = createSlice({
@@ -62,7 +68,7 @@ export const cartSlice = createSlice({
         guitar.guitarCount = action.payload.updateBy;
       }
     },
-    setCartDiscount: (state, action: PayloadAction<number>) => {
+    setCartDiscount: (state, action: PayloadAction<{amount: number, value: string}>) => {
       state.discount = action.payload;
     },
   },

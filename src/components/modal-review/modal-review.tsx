@@ -5,7 +5,7 @@ import Modal from '../modal/modal';
 import { RootState } from '../../store/store';
 import { postNewReviewAction } from '../../store/api-actions';
 import useEventListener from '../../hooks/use-event-listener';
-import { validNoticeStyle } from '../../const';
+import { validNoticeStyle, formInputsInitState } from '../../const';
 import { GuitarWithReviews } from '../../types/guitars';
 import './modal-review.css';
 
@@ -30,19 +30,6 @@ function ModalReview(props: ModalReviewProps): JSX.Element {
   const disadvantagesRef = useRef<HTMLParagraphElement>(null);
   const commentRef = useRef<HTMLParagraphElement>(null);
   const ratingRef = useRef<HTMLParagraphElement>(null);
-
-  const formInputsInitState = {
-    userName: '',
-    userNameIsValid: false,
-    advantages: '',
-    advantagesIsValid: false,
-    disadvantages: '',
-    disadvantagesIsValid: false,
-    comment: '',
-    commentIsValid: false,
-    rate: 0,
-    rateIsValid: false,
-  };
 
   const [formState, setFormState] = useState(formInputsInitState);
 

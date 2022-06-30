@@ -163,10 +163,10 @@ export const postPromocode = createAsyncThunk<
       const { data: discount } = await api.post<number>(APIRoute.Coupons, promocodeObj);
 
       if (discount) {
-        dispatch(setCartDiscount(discount));
+        dispatch(setCartDiscount({ amount: discount, value: promocode }));
       }
     } catch (e) {
-      dispatch(setCartDiscount(-1000));
+      dispatch(setCartDiscount({ amount: -1000, value: promocode }));
       throw new Error('Invalid value!');
     }
   },

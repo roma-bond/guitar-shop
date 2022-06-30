@@ -44,3 +44,16 @@ export const monthMap = new Map([
 ]);
 
 export const validNoticeStyle = { color: '#fefafa' };
+
+export const formInputsInitState = {
+  userName: '',
+  userNameIsValid: false,
+  advantages: '',
+  advantagesIsValid: false,
+  disadvantages: '',
+  disadvantagesIsValid: false,
+  comment: '',
+  commentIsValid: false,
+  rate: 0,
+  rateIsValid: false,
+};

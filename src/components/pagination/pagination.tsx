@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { GUITARS_PER_PAGE, AppRoute } from '../../const';
+import cn from 'classnames';
 import './pagination.css';
 
 type PaginationProps = {
@@ -35,17 +36,18 @@ function Pagination(props: PaginationProps): JSX.Element {
     const pages: JSX.Element[] = [];
 
     for (let index = 0; index < pagesAmount; index++) {
-      const classes =
-        activePage === index + 1
-          ? 'pagination__page pagination__page--active'
-          : 'pagination__page';
-
       const localParams = new URLSearchParams(searchParamsString);
       localParams.set('_start', (index * GUITARS_PER_PAGE).toString());
       localParams.set('_limit', GUITARS_PER_PAGE.toString());
 
       pages[index] = (
-        <li key={`pagination-page-${index}`} className={classes}>
+        <li
+          key={`pagination-page-${index}`}
+          className={cn(
+            'pagination__page',
+            {'pagination__page--active': activePage === index + 1},
+          )}
+        >
           <Link
             className="link pagination__page-link"
             to={`${AppRoute.Catalog}/page${index + 1}?${localParams.toString()}`}

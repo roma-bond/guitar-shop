@@ -35,7 +35,7 @@ function CartItem(props: CartItemProps): JSX.Element {
       e.target.value = value.slice(1);
     }
 
-    if (updateBy >= 1 && updateBy < 100) {
+    if (updateBy < 100) {
       dispatch(updateCartGuitarCount({ id: guitar.id, updateBy }));
     }
   };

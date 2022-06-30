@@ -1,4 +1,5 @@
-import { useRef, FormEvent, useEffect } from 'react';
+import { useRef, FormEvent, ChangeEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import CartItem from '../cart-item/cart-item';
 import ModalCartDelete from '../modal-cart-delete/modal-cart-delete';
@@ -6,6 +7,8 @@ import { removeGuitarFromCart, cancelGuitarRemoveFromCart, setCartDiscount } fro
 import { postPromocode } from '../../store/api-actions';
 import { RootState } from '../../store/store';
 import { formatPrice } from '../../utils/utils';
+import { AppRoute } from '../../const';
+import cn from 'classnames';
 import './cart-page.css';
 
 function CartPage(): JSX.Element {
@@ -14,15 +17,11 @@ function CartPage(): JSX.Element {
   const totalPriceWithoutDiscount = cartGuitars
     .map((guitar) => guitar.price * guitar.guitarCount)
     .reduce((a, b) => a + b, 0);
-  const purchaseDiscount = discount > 0
-    ? (discount / 100) * totalPriceWithoutDiscount
+  const purchaseDiscount = discount && discount.amount > 0
+    ? (discount.amount / 100) * totalPriceWithoutDiscount
     : 0;
 
   const dispatch = useDispatch();
-
-  useEffect(() => () => {
-    dispatch(setCartDiscount(0));
-  }, []);
 
   const handleModalClose = () => {
     if (cartGuitarBeforeRemove) {
@@ -36,17 +35,22 @@ function CartPage(): JSX.Element {
     }
   };
 
+  const handlePromocodeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if(e.target.value.includes(' ')) {
+      e.target.value = e.target.value.split(' ').join('');
+    }
+  };
+
   const handlePromocodeSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (promocodeInputRef.current) {
       const promocode = promocodeInputRef.current.value.toLowerCase();
 
-      if (promocode.includes(' ')) {
-        dispatch(setCartDiscount(-1000));
-      } else {
+      if (!promocode.includes(' ')) {
         promocode
           ? dispatch(postPromocode(promocode))
-          : dispatch(setCartDiscount(0));
+          : dispatch(setCartDiscount({ amount: 0, value: '' }));
       }
     }
   };
@@ -62,9 +66,9 @@ function CartPage(): JSX.Element {
             </a>
           </li>
           <li className="breadcrumbs__item">
-            <a className="link" href="./main.html">
+            <Link className="link" to={AppRoute.Catalog}>
               Каталог
-            </a>
+            </Link>
           </li>
           <li className="breadcrumbs__item">
             <a className="link">Корзина</a>
@@ -102,12 +106,14 @@ function CartPage(): JSX.Element {
                     placeholder="Введите промокод"
                     id="coupon"
                     name="coupon"
+                    onChange={handlePromocodeChange}
+                    defaultValue={discount ? discount.value : ''}
                   />
-                  {discount > 0 &&
+                  {discount && discount.amount > 0 &&
                     <p className="form-input__message form-input__message--success">
                       Промокод принят
                     </p>}
-                  {discount < 0 &&
+                  {discount && discount.amount < 0 &&
                     <p className="form-input__message form-input__message--error">
                       Неверный промокод
                     </p>}
@@ -124,8 +130,13 @@ function CartPage(): JSX.Element {
               </p>
               <p className="cart__total-item">
                 <span className="cart__total-value-name">Скидка:</span>
-                <span className="cart__total-value cart__total-value--bonus">
-                  - {purchaseDiscount} ₽
+                <span
+                  className={cn(
+                    'cart__total-value',
+                    {'cart__total-value--bonus': discount && discount.amount > 0 && totalPriceWithoutDiscount > 0},
+                  )}
+                >
+                  {`${discount && discount.amount > 0 && totalPriceWithoutDiscount > 0 ? '- ': ''}${purchaseDiscount}`} ₽
                 </span>
               </p>
               <p className="cart__total-item">
